@@ -288,9 +288,9 @@ OffScreenRenderWidgetHostView::OffScreenRenderWidgetHostView(
   CreatePlatformWidget(is_guest_view_hack);
 #endif
 
-  bool opaque = SkColorGetA(background_color()) == SK_AlphaOPAQUE;
+  bool opaque = SkColorGetA(background_color_) == SK_AlphaOPAQUE;
   GetRootLayer()->SetFillsBoundsOpaquely(opaque);
-  GetRootLayer()->SetColor(background_color());
+  GetRootLayer()->SetColor(background_color_);
 
 #if !defined(OS_MACOSX)
   // On macOS the ui::Compositor is created/owned by the platform view.
@@ -486,8 +486,13 @@ void OffScreenRenderWidgetHostView::SetBackgroundColor(SkColor color) {
   }
 }
 
-SkColor OffScreenRenderWidgetHostView::background_color() const {
+base::Optional<SkColor> OffScreenRenderWidgetHostView::GetBackgroundColor()
+    const {
   return background_color_;
+}
+
+void OffScreenRenderWidgetHostView::UpdateBackgroundColor() {
+  NOTREACHED();
 }
 
 gfx::Size OffScreenRenderWidgetHostView::GetVisibleViewportSize() const {
@@ -510,7 +515,7 @@ void OffScreenRenderWidgetHostView::TakeFallbackContentFrom(
               ->IsRenderWidgetHostViewGuest());
   OffScreenRenderWidgetHostView* view_osr =
       static_cast<OffScreenRenderWidgetHostView*>(view);
-  SetBackgroundColor(view_osr->background_color());
+  SetBackgroundColor(view_osr->background_color_);
   if (GetDelegatedFrameHost() && view_osr->GetDelegatedFrameHost()) {
     GetDelegatedFrameHost()->TakeFallbackContentFrom(
         view_osr->GetDelegatedFrameHost());
@@ -1286,7 +1291,7 @@ viz::FrameSinkId OffScreenRenderWidgetHostView::AllocateFrameSinkId(
 
 void OffScreenRenderWidgetHostView::UpdateBackgroundColorFromRenderer(
     SkColor color) {
-  if (color == background_color())
+  if (color == background_color_)
     return;
   background_color_ = color;
 

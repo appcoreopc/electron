@@ -100,7 +100,8 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
   gfx::Size GetVisibleViewportSize() const override;
   void SetInsets(const gfx::Insets&) override;
   void SetBackgroundColor(SkColor color) override;
-  SkColor background_color() const override;
+  base::Optional<SkColor> GetBackgroundColor() const override;
+  void UpdateBackgroundColor() override;
   bool LockMouse(void) override;
   void UnlockMouse(void) override;
   void TakeFallbackContentFrom(content::RenderWidgetHostView* view) override;
