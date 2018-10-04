@@ -26,7 +26,6 @@
 #include "components/viz/common/quads/compositor_frame.h"
 #include "components/viz/common/surfaces/parent_local_surface_id_allocator.h"
 #include "content/browser/frame_host/render_widget_host_view_guest.h"
-#include "content/browser/renderer_host/compositor_resize_lock.h"
 #include "content/browser/renderer_host/delegated_frame_host.h"
 #include "content/browser/renderer_host/input/mouse_wheel_phase_handler.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
@@ -67,15 +66,13 @@ class AtomBeginFrameTimer;
 class MacHelper;
 #endif
 
-class OffScreenRenderWidgetHostView
-    : public content::RenderWidgetHostViewBase,
-      public ui::CompositorDelegate,
+class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
+                                      public ui::CompositorDelegate,
 #if !defined(OS_MACOSX)
-      public content::DelegatedFrameHostClient,
-      public content::CompositorResizeLockClient,
+                                      public content::DelegatedFrameHostClient,
 #endif
-      public NativeWindowObserver,
-      public OffscreenViewProxyObserver {
+                                      public NativeWindowObserver,
+                                      public OffscreenViewProxyObserver {
  public:
   OffScreenRenderWidgetHostView(bool transparent,
                                 bool painting,
@@ -165,17 +162,10 @@ class OffScreenRenderWidgetHostView
   ui::Layer* DelegatedFrameHostGetLayer(void) const override;
   bool DelegatedFrameHostIsVisible(void) const override;
   SkColor DelegatedFrameHostGetGutterColor() const override;
-  bool DelegatedFrameCanCreateResizeLock() const override;
-  std::unique_ptr<content::CompositorResizeLock>
-  DelegatedFrameHostCreateResizeLock() override;
   void OnFirstSurfaceActivation(const viz::SurfaceInfo& surface_info) override;
   void OnBeginFrame(base::TimeTicks frame_time) override;
   void OnFrameTokenChanged(uint32_t frame_token) override;
   void DidReceiveFirstFrameAfterNavigation() override;
-  // CompositorResizeLockClient implementation.
-  std::unique_ptr<ui::CompositorLock> GetCompositorLock(
-      ui::CompositorLockClient* client) override;
-  void CompositorResizeLockEnded() override;
   bool IsAutoResizeEnabled() const override;
 #endif  // !defined(OS_MACOSX)
 

@@ -19,7 +19,6 @@
 #include "components/viz/common/frame_sinks/delay_based_time_source.h"
 #include "components/viz/common/gl_helper.h"
 #include "components/viz/common/quads/render_pass.h"
-#include "content/browser/renderer_host/compositor_resize_lock.h"
 #include "content/browser/renderer_host/render_widget_host_delegate.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/common/view_messages.h"
@@ -27,8 +26,8 @@
 #include "content/public/browser/context_factory.h"
 #include "content/public/browser/render_process_host.h"
 #include "media/base/video_frame.h"
-#include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/blink/public/platform/web_input_event.h"
+#include "third_party/skia/include/core/SkCanvas.h"
 #include "ui/compositor/compositor.h"
 #include "ui/compositor/layer.h"
 #include "ui/compositor/layer_type.h"
@@ -752,17 +751,6 @@ SkColor OffScreenRenderWidgetHostView::DelegatedFrameHostGetGutterColor()
   return background_color_;
 }
 
-bool OffScreenRenderWidgetHostView::DelegatedFrameCanCreateResizeLock() const {
-  return !render_widget_host_->auto_resize_enabled();
-}
-
-std::unique_ptr<content::CompositorResizeLock>
-OffScreenRenderWidgetHostView::DelegatedFrameHostCreateResizeLock() {
-  HoldResize();
-  const gfx::Size& desired_size = GetRootLayer()->bounds().size();
-  return std::make_unique<content::CompositorResizeLock>(this, desired_size);
-}
-
 void OffScreenRenderWidgetHostView::OnFirstSurfaceActivation(
     const viz::SurfaceInfo& surface_info) {}
 
@@ -780,10 +768,6 @@ std::unique_ptr<ui::CompositorLock>
 OffScreenRenderWidgetHostView::GetCompositorLock(
     ui::CompositorLockClient* client) {
   return GetCompositor()->GetCompositorLock(client);
-}
-
-void OffScreenRenderWidgetHostView::CompositorResizeLockEnded() {
-  ReleaseResize();
 }
 
 bool OffScreenRenderWidgetHostView::IsAutoResizeEnabled() const {
