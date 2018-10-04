@@ -175,13 +175,15 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
 
   void DidNavigate() override;
 
-  bool TransformPointToLocalCoordSpace(const gfx::PointF& point,
-                                       const viz::SurfaceId& original_surface,
-                                       gfx::PointF* transformed_point) override;
+  bool TransformPointToLocalCoordSpaceLegacy(
+      const gfx::PointF& point,
+      const viz::SurfaceId& original_surface,
+      gfx::PointF* transformed_point) override;
   bool TransformPointToCoordSpaceForView(
       const gfx::PointF& point,
       RenderWidgetHostViewBase* target_view,
-      gfx::PointF* transformed_point) override;
+      gfx::PointF* transformed_point,
+      viz::EventSource source = viz::EventSource::ANY) override;
 
   // ui::CompositorDelegate:
   std::unique_ptr<viz::SoftwareOutputDevice> CreateSoftwareOutputDevice(

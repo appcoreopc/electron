@@ -799,14 +799,14 @@ void OffScreenRenderWidgetHostView::DidNavigate() {
 #endif
 }
 
-bool OffScreenRenderWidgetHostView::TransformPointToLocalCoordSpace(
+bool OffScreenRenderWidgetHostView::TransformPointToLocalCoordSpaceLegacy(
     const gfx::PointF& point,
     const viz::SurfaceId& original_surface,
     gfx::PointF* transformed_point) {
   // Transformations use physical pixels rather than DIP, so conversion
   // is necessary.
   gfx::PointF point_in_pixels = gfx::ConvertPointToPixel(scale_factor_, point);
-  if (!GetDelegatedFrameHost()->TransformPointToLocalCoordSpace(
+  if (!GetDelegatedFrameHost()->TransformPointToLocalCoordSpaceLegacy(
           point_in_pixels, original_surface, transformed_point)) {
     return false;
   }
@@ -819,7 +819,8 @@ bool OffScreenRenderWidgetHostView::TransformPointToLocalCoordSpace(
 bool OffScreenRenderWidgetHostView::TransformPointToCoordSpaceForView(
     const gfx::PointF& point,
     RenderWidgetHostViewBase* target_view,
-    gfx::PointF* transformed_point) {
+    gfx::PointF* transformed_point,
+    viz::EventSource source) {
   if (target_view == this) {
     *transformed_point = point;
     return true;
@@ -829,7 +830,7 @@ bool OffScreenRenderWidgetHostView::TransformPointToCoordSpaceForView(
   // but it is not necessary here because the final target view is responsible
   // for converting before computing the final transform.
   return GetDelegatedFrameHost()->TransformPointToCoordSpaceForView(
-      point, target_view, transformed_point);
+      point, target_view, transformed_point, source);
 }
 
 void OffScreenRenderWidgetHostView::CancelWidget() {
