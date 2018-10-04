@@ -121,7 +121,7 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
   void SubmitCompositorFrame(
       const viz::LocalSurfaceId& local_surface_id,
       viz::CompositorFrame frame,
-      viz::mojom::HitTestRegionListPtr hit_test_region_list) override;
+      base::Optional<viz::HitTestRegionList> hit_test_region_list) override;
 
   void ClearCompositorFrame(void) override;
   void InitAsPopup(content::RenderWidgetHostView* rwhv,
