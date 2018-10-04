@@ -399,7 +399,7 @@ void OffScreenRenderWidgetHostView::InitAsChild(gfx::NativeView) {
 
 void OffScreenRenderWidgetHostView::SetSize(const gfx::Size& size) {
   size_ = size;
-  WasResized();
+  SynchronizeVisualProperties();
 }
 
 void OffScreenRenderWidgetHostView::SetBounds(const gfx::Rect& new_bounds) {
@@ -1009,12 +1009,13 @@ void OffScreenRenderWidgetHostView::ReleaseResize() {
     pending_resize_ = false;
     content::BrowserThread::PostTask(
         content::BrowserThread::UI, FROM_HERE,
-        base::BindOnce(&OffScreenRenderWidgetHostView::WasResized,
-                       weak_ptr_factory_.GetWeakPtr()));
+        base::BindOnce(
+            &OffScreenRenderWidgetHostView::SynchronizeVisualProperties,
+            weak_ptr_factory_.GetWeakPtr()));
   }
 }
 
-void OffScreenRenderWidgetHostView::WasResized() {
+void OffScreenRenderWidgetHostView::SynchronizeVisualProperties() {
   if (hold_resize_) {
     if (!pending_resize_)
       pending_resize_ = true;
@@ -1023,9 +1024,9 @@ void OffScreenRenderWidgetHostView::WasResized() {
 
   ResizeRootLayer(false);
   if (render_widget_host_)
-    render_widget_host_->WasResized();
-  GetDelegatedFrameHost()->WasResized(local_surface_id_, size_,
-                                      cc::DeadlinePolicy::UseDefaultDeadline());
+    render_widget_host_->SynchronizeVisualProperties();
+  GetDelegatedFrameHost()->SynchronizeVisualProperties(
+      local_surface_id_, size_, cc::DeadlinePolicy::UseDefaultDeadline());
 }
 
 void OffScreenRenderWidgetHostView::SendMouseEvent(
@@ -1264,14 +1265,15 @@ void OffScreenRenderWidgetHostView::ResizeRootLayer(bool force) {
   bool resized = UpdateNSViewAndDisplay();
 #else
   bool resized = true;
-  GetDelegatedFrameHost()->WasResized(local_surface_id_, size,
-                                      cc::DeadlinePolicy::UseDefaultDeadline());
+  GetDelegatedFrameHost()->SynchronizeVisualProperties(
+      local_surface_id_, size, cc::DeadlinePolicy::UseDefaultDeadline());
 #endif
 
   // Note that |render_widget_host_| will retrieve resize parameters from the
-  // DelegatedFrameHost, so it must have WasResized called after.
+  // DelegatedFrameHost, so it must have SynchronizeVisualProperties called
+  // after.
   if (resized && render_widget_host_)
-    render_widget_host_->WasResized();
+    render_widget_host_->SynchronizeVisualProperties();
 }
 
 viz::FrameSinkId OffScreenRenderWidgetHostView::AllocateFrameSinkId(

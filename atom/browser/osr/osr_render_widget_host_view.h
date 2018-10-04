@@ -226,7 +226,7 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
 
   void HoldResize();
   void ReleaseResize();
-  void WasResized();
+  void SynchronizeVisualProperties();
 
   void SendMouseEvent(const blink::WebMouseEvent& event);
   void SendMouseWheelEvent(const blink::WebMouseWheelEvent& event);
