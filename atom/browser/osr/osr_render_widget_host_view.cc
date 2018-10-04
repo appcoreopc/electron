@@ -468,6 +468,11 @@ bool OffScreenRenderWidgetHostView::IsShowing() {
   return is_showing_;
 }
 
+void OffScreenRenderWidgetHostView::EnsureSurfaceSynchronizedForLayoutTest() {
+  ++latest_capture_sequence_number_;
+  WasResized();
+}
+
 gfx::Rect OffScreenRenderWidgetHostView::GetViewBounds() const {
   if (IsPopupWidget())
     return popup_position_;
@@ -662,6 +667,10 @@ void OffScreenRenderWidgetHostView::SetTooltipText(const base::string16&) {}
 
 void OffScreenRenderWidgetHostView::SelectionBoundsChanged(
     const ViewHostMsg_SelectionBounds_Params&) {}
+
+int32_t OffScreenRenderWidgetHostView::GetCaptureSequenceNumber() const {
+  return latest_capture_sequence_number_;
+}
 
 void OffScreenRenderWidgetHostView::CopyFromSurface(
     const gfx::Rect& src_rect,

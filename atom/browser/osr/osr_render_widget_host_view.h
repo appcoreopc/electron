@@ -92,10 +92,12 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
   ui::TextInputClient* GetTextInputClient() override;
   void Focus(void) override;
   bool HasFocus(void) const override;
+  uint32_t GetCaptureSequenceNumber() const override;
   bool IsSurfaceAvailableForCopy(void) const override;
   void Show(void) override;
   void Hide(void) override;
   bool IsShowing(void) override;
+  void EnsureSurfaceSynchronizedForLayoutTest() override;
   gfx::Rect GetViewBounds(void) const override;
   gfx::Size GetVisibleViewportSize() const override;
   void SetInsets(const gfx::Insets&) override;
@@ -336,6 +338,11 @@ class OffScreenRenderWidgetHostView : public content::RenderWidgetHostViewBase,
 
   viz::mojom::CompositorFrameSinkClient* renderer_compositor_frame_sink_ =
       nullptr;
+
+  // Latest capture sequence number which is incremented when the caller
+  // requests surfaces be synchronized via
+  // EnsureSurfaceSynchronizedForLayoutTest().
+  uint32_t latest_capture_sequence_number_ = 0u;
 
   SkColor background_color_ = SkColor();
 
